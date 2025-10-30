@@ -11,3 +11,18 @@ srun -w dgx04,dgx06 -N 2 --gres=gpu:2 --mpi=pmix \
 NCCL_SOCKET_IFNAME=ibp*,NCCL_IB_HCA=mlx5_0,mlx5_3,mlx5_4,mlx5_5,mlx5_6,mlx5_9,mlx5_10,mlx5_11,\
 NCCL_IB_GID_INDEX=3,NCCL_CROSS_NIC=1,NCCL_NET_GDR_LEVEL=2" \
   all_reduce_perf_mpi -b 64M -e 2G -f 2 -g 2
+
+
+
+root@dgx04:~# lsmod | egrep "mlx5|nvidia-peermem"
+mlx5_ib               548864  0
+ib_uverbs             200704  2 rdma_ucm,mlx5_ib
+macsec                 77824  1 mlx5_ib
+ib_core               524288  8 rdma_cm,ib_ipoib,iw_cm,ib_umad,rdma_ucm,ib_uverbs,mlx5_ib,ib_cm
+mlx5_core            2809856  1 mlx5_ib
+mlxfw                  36864  1 mlx5_core
+psample                16384  1 mlx5_core
+mlxdevm               184320  1 mlx5_core
+tls                   155648  10 bonding,mlx5_core
+pci_hyperv_intf        12288  1 mlx5_core
+mlx_compat             20480  15 rdma_cm,ib_ipoib,mlxdevm,nvme,mlxfw,iw_cm,nvme_core,nvme_fabrics,ib_umad,ib_core,rdma_ucm,ib_uverbs,mlx5_ib,ib_cm,mlx5_core
