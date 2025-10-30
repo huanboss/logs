@@ -26,3 +26,128 @@ mlxdevm               184320  1 mlx5_core
 tls                   155648  10 bonding,mlx5_core
 pci_hyperv_intf        12288  1 mlx5_core
 mlx_compat             20480  15 rdma_cm,ib_ipoib,mlxdevm,nvme,mlxfw,iw_cm,nvme_core,nvme_fabrics,ib_umad,ib_core,rdma_ucm,ib_uverbs,mlx5_ib,ib_cm,mlx5_core
+
+#####
+Chuẩn rồi — trên **host** bạn đã có RDMA (mlx5\_ib, ib\_core, ib\_ipoib… đều OK). Nhưng trong log NCCL vẫn báo:
+
+* `NET/IB : No device found.`
+* `Using network Socket`
+
+→ Tức là **bên trong container** của Pyxis/Enroot **không thấy** thiết bị RDMA và/hoặc lib ibverbs ⇒ NCCL rơi xuống TCP (IPoIB). Kết quả chỉ \~2.8 GB/s.
+
+Ngoài ra, host của bạn **chưa có `nvidia_peermem`** (không thấy trong `lsmod`), nên dù có RDMA thì cũng chưa bật **GPUDirect RDMA**.
+
+---
+
+## Cách xử nhanh (chạy được ngay)
+
+**1) Bind-mount RDMA + ibverbs vào container** (để NCCL dùng IB thay vì Socket):
+
+```bash
+srun -w dgx04,dgx06 -N 2 --gres=gpu:2 --mpi=pmix \
+  --container-image nvcr.io#nvidia/pytorch:24.09-py3 \
+  --container-mounts=/dev/infiniband:/dev/infiniband,\
+/sys/class/infiniband:/sys/class/infiniband:ro,\
+/sys/class/infiniband_verbs:/sys/class/infiniband_verbs:ro,\
+/sys/class/infiniband_cm:/sys/class/infiniband_cm:ro,\
+/run/udev:/run/udev:ro,\
+/etc/libibverbs.d:/etc/libibverbs.d:ro,\
+/usr/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:ro \
+  --export="NCCL_DEBUG=INFO,NCCL_NET=IB,\
+NCCL_IB_HCA=mlx5_0,mlx5_3,mlx5_4,mlx5_5,mlx5_6,mlx5_9,mlx5_10,mlx5_11,\
+NCCL_CROSS_NIC=1,NCCL_IB_GID_INDEX=3" \
+  all_reduce_perf_mpi -b 64M -e 2G -f 2 -g 2
+```
+
+> Lưu ý: nếu distro là RHEL/CentOS, thay `/usr/lib/x86_64-linux-gnu` bằng `/usr/lib64`.
+
+**2) Xác nhận trong container đã thấy IB:**
+
+```bash
+srun -w dgx04 -N1 --gres=gpu:1 --mpi=pmix \
+  --container-image nvcr.io#nvidia/pytorch:24.09-py3 \
+  --container-mounts=/dev/infiniband:/dev/infiniband,/run/udev:/run/udev:ro \
+  bash -lc 'ls -l /dev/infiniband; ibv_devices; ibstat'
+```
+
+* Nếu thấy device (mlx5\_\*), ports **ACTIVE** → OK.
+* Chạy lại bài test và kiểm tra log NCCL phải có “`Using network IB`” (không còn “No device found”).
+
+---
+
+## Bật GPUDirect RDMA (khuyến nghị hiệu năng)
+
+Trên **mỗi host**:
+
+```bash
+# nạp module
+sudo modprobe nvidia-peermem
+
+# bật vĩnh viễn
+echo nvidia-peermem | sudo tee /etc/modules-load.d/nvidia-peermem.conf
+```
+
+* Nếu báo “module not found”: cài gói `nvidia-peermem` (theo bản DGX driver/MOFED đang dùng).
+* Kiểm tra:
+
+```bash
+lsmod | egrep "nvidia_peermem|mlx5|ib_core"
+```
+
+---
+
+## Fix bền vững (khỏi phải gõ mount dài dòng)
+
+**Enroot hook** (trên mỗi node chạy Slurm/Pyxis):
+
+Tạo `/etc/enroot/hooks.d/50-rdma.sh` (chmod +x):
+
+```bash
+#!/bin/sh
+mount --bind /dev/infiniband ${ENROOT_ROOTFS}/dev/infiniband
+mount -t bind -o ro /sys/class/infiniband ${ENROOT_ROOTFS}/sys/class/infiniband
+mount -t bind -o ro /sys/class/infiniband_verbs ${ENROOT_ROOTFS}/sys/class/infiniband_verbs
+mount -t bind -o ro /sys/class/infiniband_cm ${ENROOT_ROOTFS}/sys/class/infiniband_cm
+mount -t bind -o ro /run/udev ${ENROOT_ROOTFS}/run/udev
+# chỉnh đường dẫn lib theo distro
+if [ -d /usr/lib/x86_64-linux-gnu ]; then
+  mount -t bind -o ro /usr/lib/x86_64-linux-gnu ${ENROOT_ROOTFS}/usr/lib/x86_64-linux-gnu
+else
+  mount -t bind -o ro /usr/lib64 ${ENROOT_ROOTFS}/usr/lib64
+fi
+mount -t bind -o ro /etc/libibverbs.d ${ENROOT_ROOTFS}/etc/libibverbs.d
+```
+
+Từ đó về sau, mọi container Pyxis tự có RDMA.
+
+---
+
+## Mẹo tối ưu H200 + QM9700
+
+* **Multi-rail**: bạn đã liệt kê nhiều HCA → giữ `NCCL_CROSS_NIC=1` và danh sách trong `NCCL_IB_HCA`.
+* **SHARP offload** (nếu QM9700 đã bật SHARP daemons và bạn dùng HPC-X plugin):
+
+  ```
+  export NCCL_COLLNET_ENABLE=1
+  export NCCL_ALGO=Tree
+  ```
+* **memlock**: đảm bảo không giới hạn (trong Slurm prolog hoặc job):
+
+  ```
+  ulimit -l unlimited
+  ```
+* **Ép fail nếu thiếu IB** (tránh rơi về Socket mà không biết):
+
+  ```
+  export NCCL_NET=IB
+  export NCCL_IB_DISABLE=0
+  ```
+
+---
+
+## Bạn đang ở bước nào?
+
+* Host đã có RDMA driver (`mlx5_ib` OK).
+* Thiếu `nvidia_peermem` (không bắt buộc để “nhìn thấy” IB, nhưng nên bật để có **GPUDirect RDMA**).
+* Vấn đề chính: **container chưa có /dev/infiniband + libibverbs** ⇒ thêm bind-mount như trên, chạy lại là NCCL sẽ dùng **IB** thay vì **Socket**.
+* Sau khi sửa, log NCCL sẽ hiển thị **`NET/IB : Dev mlx5_...`** và băng thông tăng rõ rệt.
