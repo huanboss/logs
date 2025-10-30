@@ -1,0 +1,13 @@
+srun -w dgx04,dgx06 -N 2 --gres=gpu:2 --mpi=pmix \
+  --container-image nvcr.io#nvidia/pytorch:24.09-py3 \
+  --container-mounts=/dev/infiniband:/dev/infiniband,\
+/sys/class/infiniband:/sys/class/infiniband:ro,\
+/sys/class/infiniband_verbs:/sys/class/infiniband_verbs:ro,\
+/sys/class/infiniband_cm:/sys/class/infiniband_cm:ro,\
+/run/udev:/run/udev:ro,\
+/etc/libibverbs.d:/etc/libibverbs.d:ro,\
+/usr/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:ro \
+  --export="NCCL_DEBUG=INFO,NCCL_NET=IB,\
+NCCL_SOCKET_IFNAME=ibp*,NCCL_IB_HCA=mlx5_0,mlx5_3,mlx5_4,mlx5_5,mlx5_6,mlx5_9,mlx5_10,mlx5_11,\
+NCCL_IB_GID_INDEX=3,NCCL_CROSS_NIC=1,NCCL_NET_GDR_LEVEL=2" \
+  all_reduce_perf_mpi -b 64M -e 2G -f 2 -g 2
