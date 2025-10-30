@@ -27,6 +27,22 @@ tls                   155648  10 bonding,mlx5_core
 pci_hyperv_intf        12288  1 mlx5_core
 mlx_compat             20480  15 rdma_cm,ib_ipoib,mlxdevm,nvme,mlxfw,iw_cm,nvme_core,nvme_fabrics,ib_umad,ib_core,rdma_ucm,ib_uverbs,mlx5_ib,ib_cm,mlx5_core
 
+
+root@dgx06:/# find -name "*peermem*"
+find: ‘./proc/2719500’: No such file or directory
+find: ‘./proc/2794241’: No such file or directory
+find: ‘./proc/2821945’: No such file or directory
+find: ‘./proc/2848692’: No such file or directory
+find: ‘./proc/2882128’: No such file or directory
+find: ‘./proc/2898338’: No such file or directory
+./sys/module/nvidia_uvm/parameters/uvm_exp_gpu_cache_peermem
+./var/lib/dkms/nvidia/570.133.20/6.8.0-51-generic/x86_64/module/nvidia-peermem.ko.zst
+./usr/src/nvidia-570.133.20/nvidia-peermem
+./usr/src/nvidia-570.133.20/nvidia-peermem/nvidia-peermem.c
+./usr/src/nvidia-570.133.20/nvidia-peermem/nvidia-peermem.Kbuild
+./usr/lib/modules/6.8.0-51-generic/updates/dkms/nvidia-peermem.ko.zst
+
+
 #####
 Chuẩn rồi — trên **host** bạn đã có RDMA (mlx5\_ib, ib\_core, ib\_ipoib… đều OK). Nhưng trong log NCCL vẫn báo:
 
