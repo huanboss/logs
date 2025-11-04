@@ -35,3 +35,23 @@ sriov-network-config-daemon-zg9dh                                 1/1     Runnin
 
 kubectl -n network-operator logs ds/sriov-network-config-daemon -c sriov-network-config-daemon | tail -n 200
 
+export NCCL_DEBUG=INFO
+export NCCL_ASYNC_ERROR_HANDLING=1
+
+# Chỉ rõ dùng IB/RDMA, tránh TCP:
+export NCCL_IB_DISABLE=0
+export NCCL_NET_GDR_LEVEL=2          # bật GPUDirect RDMA nếu hỗ trợ
+export NCCL_IB_PCI_RELAXED_ORDERING=1
+
+# Hạn chế NCCL dùng interface TCP (phòng khi fallback):
+export NCCL_SOCKET_IFNAME=^eth0,eno1,enp*,wlan*
+
+# Chọn HCA IB (multi-rail sẽ tự sử dụng nhiều HCA nếu khả dụng):
+export NCCL_IB_HCA=mlx5_0,mlx5_1,mlx5_2,mlx5_3   # chỉnh theo `ibdev2netdev`
+
+# (Tùy chọn tinh chỉnh hiệu năng)
+export NCCL_MIN_NCHANNELS=8
+export NCCL_MAX_NCHANNELS=32
+export NCCL_IB_QPS_PER_CONNECTION=2
+
+
