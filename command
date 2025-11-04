@@ -31,3 +31,4 @@ sriov-network-config-daemon-t2mdp                                 1/1     Runnin
 sriov-network-config-daemon-v88qp                                 1/1     Running   0                42d
 sriov-network-config-daemon-zg9dh                                 1/1     Running   0                42d
 
+  Warning  FailedScheduling  50s   default-scheduler  0/8 nodes are available: 3 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }, 5 Insufficient nvidia.com/resibp154s0, 5 Insufficient nvidia.com/resibp192s0, 5 Insufficient nvidia.com/resibp206s0, 5 Insufficient nvidia.com/resibp220s0, 5 Insufficient nvidia.com/resibp24s0, 5 Insufficient nvidia.com/resibp64s0, 5 Insufficient nvidia.com/resibp79s0, 5 Insufficient nvidia.com/resibp94s0. no new claims to deallocate, preemption: 0/8 nodes are available: 3 Preemption is not helpful for scheduling, 5 No preemption victims found for incoming pod.
