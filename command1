@@ -1,0 +1,93 @@
+Phân tích log bạn cung cấp (`kubectl -n network-operator logs ds/sriov-network-config-daemon -c sriov-network-config-daemon | tail -n 200`) cho thấy **SR-IOV chưa được cấu hình thành công**, và đó là lý do khiến pod của bạn ở trạng thái **`Pending` (Insufficient nvidia.com/resibpxxx)**.
+
+---
+
+### 🔍 Nguyên nhân chính
+
+Trong log có dòng lỗi quan trọng:
+
+```
+ERROR  sriov/sriov.go:583 configSriovVFDevices(): unable to get PF link for device  {"device": "0000:18:00.0", "error": "message too long"}
+ERROR  generic_plugin.go:238 cannot configure sriov interfaces {"error": "message too long"}
+```
+
+→ Nghĩa là SR-IOV Config Daemon **không thể cấu hình PF (Physical Function)** của card Infiniband (`ibp24s0`, `0000:18:00.0`).
+Nguyên nhân phổ biến:
+
+1. **Firmware hoặc driver Mellanox** (ConnectX-7) chưa bật chế độ SR-IOV hoàn toàn.
+2. **Kernel lockdown mode** đang bật (`[none] integrity confidentiality`) → khiến daemon không được phép ghi vào `/sys/bus/pci/devices/.../sriov_numvfs`.
+3. **PF chưa được cấu hình NumVFs** (log cho thấy `desired=16, current=0`).
+4. Card Infiniband có thể đang ở **IB mode**, trong khi SR-IOV yêu cầu Ethernet mode nếu không cấu hình IB SRIOV.
+
+---
+
+### 🧩 Kiểm tra lại trên host
+
+SSH vào **node chứa card lỗi**, chạy các lệnh sau:
+
+```bash
+# Kiểm tra trạng thái SR-IOV
+sudo lspci | grep -i mell
+sudo lspci -vvv -s 0000:18:00.0 | grep -i vf
+
+# Kiểm tra số VF hiện có
+cat /sys/class/net/ibp24s0/device/sriov_totalvfs
+cat /sys/class/net/ibp24s0/device/sriov_numvfs
+
+# Thử kích hoạt bằng tay (nếu NumVFs = 0)
+echo 16 | sudo tee /sys/class/net/ibp24s0/device/sriov_numvfs
+```
+
+Nếu lỗi `Invalid argument` hoặc `Operation not permitted` → kernel lockdown hoặc driver chưa hỗ trợ IB SR-IOV.
+
+---
+
+### ⚙️ Cách xử lý đề xuất
+
+#### ✅ Cách 1: Bật SR-IOV trong BIOS + Firmware
+
+* Vào BIOS → bật **SR-IOV** và **IOMMU** (Intel VT-d hoặc AMD-Vi).
+* Kiểm tra trong firmware card Mellanox (qua `mstconfig`):
+
+  ```bash
+  sudo mst start
+  sudo mstconfig -d 0000:18:00.0 set SRIOV_EN=1 NUM_OF_VFS=16 LINK_TYPE_P1=2
+  sudo mstconfig -d 0000:18:00.0 q | grep -E "SRIOV_EN|NUM_OF_VFS|LINK_TYPE_P1"
+  ```
+
+  > `LINK_TYPE_P1=2` nghĩa là Ethernet mode; `1` là Infiniband mode.
+
+#### ✅ Cách 2: Tắt kernel lockdown (nếu đang bật)
+
+```bash
+sudo mokutil --sb-state   # Nếu Secure Boot: enabled
+sudo grubby --update-kernel=ALL --args="lockdown=none"
+sudo reboot
+```
+
+#### ✅ Cách 3: Kiểm tra lại `SriovNetworkNodePolicy`
+
+* Đảm bảo mỗi PF được định nghĩa đúng `numVfs` và `resourceName`.
+* `deviceType` nên là `netdevice` (đúng rồi).
+* Nếu bạn đang dùng Infiniband mode (`linkType: ib`) → cần xác nhận firmware card hỗ trợ IB SR-IOV (ConnectX-7 có, nhưng đôi khi phải enable thêm trong firmware).
+
+---
+
+### 🧠 Kết luận
+
+* `SriovNetworkConfigDaemon` chưa tạo được VF do **kernel lockdown hoặc SR-IOV IB mode không hỗ trợ**.
+* Pod `Pending` vì tài nguyên `nvidia.com/resibpxxx` chưa tồn tại (chưa được `sriov-device-plugin` đăng ký).
+* Cần **bật SR-IOV + đảm bảo card ở chế độ hỗ trợ VF**.
+
+---
+
+Nếu bạn gửi thêm kết quả của các lệnh sau từ 1 node có lỗi, tôi sẽ chỉ chính xác bước fix:
+
+```bash
+lspci -nn | grep -i mlx
+cat /sys/class/net/ibp24s0/device/sriov_numvfs
+mstconfig -d 0000:18:00.0 q | grep -E "LINK_TYPE|SRIOV_EN|NUM_OF_VFS"
+dmesg | grep -i sriov
+```
+
+Bạn có muốn tôi giúp viết lại file `SriovNetworkNodePolicy` mẫu cho ConnectX-7 (Infiniband mode) chuẩn để test không?
