@@ -1,0 +1,76 @@
+Description: When the cluster's status is ‘disconnected’, there is no communication from the cluster services reaching the Run:ai Platform. This may be due to networking issues or issues with Run:ai services.
+
+Mitigation:
+
+Check Run:ai’s services status:
+
+Open your terminal
+Make sure you have access to the Kubernetes cluster with permission to view pods
+Copy and paste the following command to verify that Run:ai’s services are running:
+
+kubectl get pods -n runai | grep -E 'runai-agent|cluster-sync|assets-sync'
+* If any of the services are not running, see the ‘cluster has service issues’ scenario.
+Check the network connection
+
+Open your terminal
+Make sure you have access to the Kubernetes cluster with permissions to create pods
+Copy and paste the following command to create a connectivity check pod:
+
+kubectl run control-plane-connectivity-check -n runai --image=wbitt/network-multitool \
+    --command -- /bin/sh -c 'curl -sSf <control-plane-endpoint> > /dev/null && echo "Connection Successful" \
+    || echo "Failed connecting to the Control Plane"'
+Replace <control-plane-endpoint> with the URL of the Control Plane in your environment. If the pod fails to connect to the Control Plane, check for potential network policies
+Check and modify the network policies
+
+Open your terminal
+Copy and paste the following command to check the existence of network policies:
+
+
+kubectl get networkpolicies -n runai
+Review the policies to ensure that they allow traffic from the Run:ai namespace to the Control Plane. If necessary, update the policies to allow the required traffic. Example of allowing traffic:
+
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+name: allow-control-plane-traffic
+namespace: runai
+spec:
+podSelector:
+    matchLabels:
+    app: runai
+policyTypes:
+    - Ingress
+    - Egress
+egress:
+    - to:
+        - ipBlock:
+            cidr: <control-plane-ip-range>
+    ports:
+        - protocol: TCP
+        port: <control-plane-port>
+ingress:
+    - from:
+        - ipBlock:
+            cidr: <control-plane-ip-range>
+    ports:
+        - protocol: TCP
+        port: <control-plane-port>
+Check infrastructure-level configurations:
+
+Ensure that firewall rules and security groups allow traffic between your Kubernetes cluster and the Control Plane
+Verify required ports and protocols:
+Ensure that the necessary ports and protocols for Run:ai’s services are not blocked by any firewalls or security groups
+Check Run:ai services logs
+
+Open your terminal
+Make sure you have access to the Kubernetes cluster with permissions to view logs
+Copy and paste the following commands to view the logs of the Run:ai services:
+
+kubectl logs deployment/runai-agent -n runai
+kubectl logs deployment/cluster-sync -n runai
+kubectl logs deployment/assets-sync -n runai
+Try to identify the problem from the logs. If you cannot resolve the issue, continue to the next step.
+Contact Run:ai’s support
+
+If the issue persists, contact Run:ai’s support for assistance.
