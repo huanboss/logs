@@ -91,3 +91,14 @@ dmesg | grep -i sriov
 ```
 
 Bạn có muốn tôi giúp viết lại file `SriovNetworkNodePolicy` mẫu cho ConnectX-7 (Infiniband mode) chuẩn để test không?
+
+
+root@dgx04:~# sudo lspci -vvv -s 0000:18:00.0 | grep -i vf
+                Initial VFs: 16, Total VFs: 16, Number of VFs: 0, Function Dependency Link: 00
+                VF offset: 1, stride: 1, Device ID: 101e
+                VF Migration: offset: 00000000, BIR: 0
+root@dgx04:~# cat /sys/class/net/ibp24s0/device/sriov_totalvfs
+16
+root@dgx04:~# cat /sys/class/net/ibp24s0/device/sriov_numvfs
+0
+
