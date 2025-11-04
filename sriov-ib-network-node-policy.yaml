@@ -1,0 +1,150 @@
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: ibp24s0
+  namespace: network-operator
+spec:
+  deviceType: netdevice
+  nodeSelector:
+    feature.node.kubernetes.io/network-sriov.capable: "true"
+  nicSelector:
+    vendor: "15b3"
+    pfNames: ["ibp24s0"]
+  linkType: ib
+  isRdma: true
+  numVfs: 16
+  priority: 90
+  resourceName: resibp24s0
+
+---
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: ibp64s0
+  namespace: network-operator
+spec:
+  deviceType: netdevice
+  nodeSelector:
+    feature.node.kubernetes.io/network-sriov.capable: "true"
+  nicSelector:
+    vendor: "15b3"
+    pfNames: ["ibp64s0"]
+  linkType: ib
+  isRdma: true
+  numVfs: 16
+  priority: 90
+  resourceName: resibp64s0
+
+---
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: ibp79s0
+  namespace: network-operator
+spec:
+  deviceType: netdevice
+  nodeSelector:
+    feature.node.kubernetes.io/network-sriov.capable: "true"
+  nicSelector:
+    vendor: "15b3"
+    pfNames: ["ibp79s0"]
+  linkType: ib
+  isRdma: true
+  numVfs: 16
+  priority: 90
+  resourceName: resibp79s0
+
+---
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: ibp94s0
+  namespace: network-operator
+spec:
+  deviceType: netdevice
+  nodeSelector:
+    feature.node.kubernetes.io/network-sriov.capable: "true"
+  nicSelector:
+    vendor: "15b3"
+    pfNames: ["ibp94s0"]
+  linkType: ib
+  isRdma: true
+  numVfs: 16
+  priority: 90
+  resourceName: resibp94s0
+
+---
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: ibp154s0
+  namespace: network-operator
+spec:
+  deviceType: netdevice
+  nodeSelector:
+    feature.node.kubernetes.io/network-sriov.capable: "true"
+  nicSelector:
+    vendor: "15b3"
+    pfNames: ["ibp154s0"]
+  linkType: ib
+  isRdma: true
+  numVfs: 16
+  priority: 90
+  resourceName: resibp154s0
+
+---
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: ibp192s0
+  namespace: network-operator
+spec:
+  deviceType: netdevice
+  nodeSelector:
+    feature.node.kubernetes.io/network-sriov.capable: "true"
+  nicSelector:
+    vendor: "15b3"
+    pfNames: ["ibp192s0"]
+  linkType: ib
+  isRdma: true
+  numVfs: 16
+  priority: 90
+  resourceName: resibp192s0
+
+---
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: ibp206s0
+  namespace: network-operator
+spec:
+  deviceType: netdevice
+  nodeSelector:
+    feature.node.kubernetes.io/network-sriov.capable: "true"
+  nicSelector:
+    vendor: "15b3"
+    pfNames: ["ibp206s0"]
+  linkType: ib
+  isRdma: true
+  numVfs: 16
+  priority: 90
+  resourceName: resibp206s0
+
+---
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: ibp220s0
+  namespace: network-operator
+spec:
+  deviceType: netdevice
+  nodeSelector:
+    feature.node.kubernetes.io/network-sriov.capable: "true"
+  nicSelector:
+    vendor: "15b3"
+    pfNames: ["ibp220s0"]
+  linkType: ib
+  isRdma: true
+  numVfs: 16
+  priority: 90
+  resourceName: resibp220s0
