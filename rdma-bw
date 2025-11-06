@@ -1,0 +1,115 @@
+root@dgx04:~# ib_write_bw --report_gbits -q 16 -F  -D 20 -d mlx5_0
+ WARNING: BW peak won't be measured in this run.
+
+************************************
+* Waiting for client to connect... *
+************************************
+---------------------------------------------------------------------------------------
+                    RDMA_Write BW Test
+ Dual-port       : OFF          Device         : mlx5_0
+ Number of qps   : 16           Transport type : IB
+ Connection type : RC           Using SRQ      : OFF
+ PCIe relax order: ON           Lock-free      : OFF
+ ibv_wr* API     : ON           Using DDP      : OFF
+ CQ Moderation   : 1
+ Mtu             : 4096[B]
+ Link type       : IB
+ Max inline data : 0[B]
+ rdma_cm QPs     : OFF
+ Data ex. method : Ethernet
+---------------------------------------------------------------------------------------
+ local address: LID 0x13 QPN 0x0515 PSN 0x28b115 RKey 0x1fff00 VAddr 0x00155554d01000
+ local address: LID 0x13 QPN 0x0516 PSN 0x8faddb RKey 0x1fff00 VAddr 0x00155554d11000
+ local address: LID 0x13 QPN 0x0517 PSN 0xb54989 RKey 0x1fff00 VAddr 0x00155554d21000
+ local address: LID 0x13 QPN 0x0518 PSN 0xb404a4 RKey 0x1fff00 VAddr 0x00155554d31000
+ local address: LID 0x13 QPN 0x0519 PSN 0x7307e7 RKey 0x1fff00 VAddr 0x00155554d41000
+ local address: LID 0x13 QPN 0x051a PSN 0xa03cbd RKey 0x1fff00 VAddr 0x00155554d51000
+ local address: LID 0x13 QPN 0x051b PSN 0xf16bd8 RKey 0x1fff00 VAddr 0x00155554d61000
+ local address: LID 0x13 QPN 0x051c PSN 0x9436f1 RKey 0x1fff00 VAddr 0x00155554d71000
+ local address: LID 0x13 QPN 0x051d PSN 0x72c441 RKey 0x1fff00 VAddr 0x00155554d81000
+ local address: LID 0x13 QPN 0x051e PSN 0xe2732f RKey 0x1fff00 VAddr 0x00155554d91000
+ local address: LID 0x13 QPN 0x051f PSN 0x4c7aa7 RKey 0x1fff00 VAddr 0x00155554da1000
+ local address: LID 0x13 QPN 0x0520 PSN 0xf103ae RKey 0x1fff00 VAddr 0x00155554db1000
+ local address: LID 0x13 QPN 0x0521 PSN 0x5dd302 RKey 0x1fff00 VAddr 0x00155554dc1000
+ local address: LID 0x13 QPN 0x0522 PSN 0xaa8d87 RKey 0x1fff00 VAddr 0x00155554dd1000
+ local address: LID 0x13 QPN 0x0523 PSN 0xb91139 RKey 0x1fff00 VAddr 0x00155554de1000
+ local address: LID 0x13 QPN 0x0524 PSN 0x1b5b09 RKey 0x1fff00 VAddr 0x00155554df1000
+ remote address: LID 0x20 QPN 0x0508 PSN 0xbb4f85 RKey 0x1fff00 VAddr 0x00155554d01000
+ remote address: LID 0x20 QPN 0x0509 PSN 0x95c38b RKey 0x1fff00 VAddr 0x00155554d11000
+ remote address: LID 0x20 QPN 0x050a PSN 0x8a579 RKey 0x1fff00 VAddr 0x00155554d21000
+ remote address: LID 0x20 QPN 0x050b PSN 0xbc9d4 RKey 0x1fff00 VAddr 0x00155554d31000
+ remote address: LID 0x20 QPN 0x050c PSN 0x3b1d57 RKey 0x1fff00 VAddr 0x00155554d41000
+ remote address: LID 0x20 QPN 0x050d PSN 0x53fd6d RKey 0x1fff00 VAddr 0x00155554d51000
+ remote address: LID 0x20 QPN 0x050e PSN 0xd896c8 RKey 0x1fff00 VAddr 0x00155554d61000
+ remote address: LID 0x20 QPN 0x050f PSN 0xd51f21 RKey 0x1fff00 VAddr 0x00155554d71000
+ remote address: LID 0x20 QPN 0x0510 PSN 0xf0c0b1 RKey 0x1fff00 VAddr 0x00155554d81000
+ remote address: LID 0x20 QPN 0x0511 PSN 0x938edf RKey 0x1fff00 VAddr 0x00155554d91000
+ remote address: LID 0x20 QPN 0x0512 PSN 0xd56497 RKey 0x1fff00 VAddr 0x00155554da1000
+ remote address: LID 0x20 QPN 0x0513 PSN 0xaa3ede RKey 0x1fff00 VAddr 0x00155554db1000
+ remote address: LID 0x20 QPN 0x0514 PSN 0xa92672 RKey 0x1fff00 VAddr 0x00155554dc1000
+ remote address: LID 0x20 QPN 0x0515 PSN 0xf3b437 RKey 0x1fff00 VAddr 0x00155554dd1000
+ remote address: LID 0x20 QPN 0x0516 PSN 0xe0aa29 RKey 0x1fff00 VAddr 0x00155554de1000
+ remote address: LID 0x20 QPN 0x0517 PSN 0x9f1939 RKey 0x1fff00 VAddr 0x00155554df1000
+---------------------------------------------------------------------------------------
+ #bytes     #iterations    BW peak[Gb/sec]    BW average[Gb/sec]   MsgRate[Mpps]
+ 65536      7526227          0.00               394.59               0.752624
+---------------------------------------------------------------------------------------
+
+######################
+
+root@dgx06:~# ib_write_bw dgx04 --report_gbits -q 16 -F  -D 20 -d mlx5_0
+
+ WARNING: BW peak won't be measured in this run.
+---------------------------------------------------------------------------------------
+                    RDMA_Write BW Test
+ Dual-port       : OFF          Device         : mlx5_0
+ Number of qps   : 16           Transport type : IB
+ Connection type : RC           Using SRQ      : OFF
+ PCIe relax order: ON           Lock-free      : OFF
+ ibv_wr* API     : ON           Using DDP      : OFF
+ TX depth        : 128
+ CQ Moderation   : 1
+ Mtu             : 4096[B]
+ Link type       : IB
+ Max inline data : 0[B]
+ rdma_cm QPs     : OFF
+ Data ex. method : Ethernet
+---------------------------------------------------------------------------------------
+ local address: LID 0x20 QPN 0x0508 PSN 0xbb4f85 RKey 0x1fff00 VAddr 0x00155554d01000
+ local address: LID 0x20 QPN 0x0509 PSN 0x95c38b RKey 0x1fff00 VAddr 0x00155554d11000
+ local address: LID 0x20 QPN 0x050a PSN 0x8a579 RKey 0x1fff00 VAddr 0x00155554d21000
+ local address: LID 0x20 QPN 0x050b PSN 0xbc9d4 RKey 0x1fff00 VAddr 0x00155554d31000
+ local address: LID 0x20 QPN 0x050c PSN 0x3b1d57 RKey 0x1fff00 VAddr 0x00155554d41000
+ local address: LID 0x20 QPN 0x050d PSN 0x53fd6d RKey 0x1fff00 VAddr 0x00155554d51000
+ local address: LID 0x20 QPN 0x050e PSN 0xd896c8 RKey 0x1fff00 VAddr 0x00155554d61000
+ local address: LID 0x20 QPN 0x050f PSN 0xd51f21 RKey 0x1fff00 VAddr 0x00155554d71000
+ local address: LID 0x20 QPN 0x0510 PSN 0xf0c0b1 RKey 0x1fff00 VAddr 0x00155554d81000
+ local address: LID 0x20 QPN 0x0511 PSN 0x938edf RKey 0x1fff00 VAddr 0x00155554d91000
+ local address: LID 0x20 QPN 0x0512 PSN 0xd56497 RKey 0x1fff00 VAddr 0x00155554da1000
+ local address: LID 0x20 QPN 0x0513 PSN 0xaa3ede RKey 0x1fff00 VAddr 0x00155554db1000
+ local address: LID 0x20 QPN 0x0514 PSN 0xa92672 RKey 0x1fff00 VAddr 0x00155554dc1000
+ local address: LID 0x20 QPN 0x0515 PSN 0xf3b437 RKey 0x1fff00 VAddr 0x00155554dd1000
+ local address: LID 0x20 QPN 0x0516 PSN 0xe0aa29 RKey 0x1fff00 VAddr 0x00155554de1000
+ local address: LID 0x20 QPN 0x0517 PSN 0x9f1939 RKey 0x1fff00 VAddr 0x00155554df1000
+ remote address: LID 0x13 QPN 0x0515 PSN 0x28b115 RKey 0x1fff00 VAddr 0x00155554d01000
+ remote address: LID 0x13 QPN 0x0516 PSN 0x8faddb RKey 0x1fff00 VAddr 0x00155554d11000
+ remote address: LID 0x13 QPN 0x0517 PSN 0xb54989 RKey 0x1fff00 VAddr 0x00155554d21000
+ remote address: LID 0x13 QPN 0x0518 PSN 0xb404a4 RKey 0x1fff00 VAddr 0x00155554d31000
+ remote address: LID 0x13 QPN 0x0519 PSN 0x7307e7 RKey 0x1fff00 VAddr 0x00155554d41000
+ remote address: LID 0x13 QPN 0x051a PSN 0xa03cbd RKey 0x1fff00 VAddr 0x00155554d51000
+ remote address: LID 0x13 QPN 0x051b PSN 0xf16bd8 RKey 0x1fff00 VAddr 0x00155554d61000
+ remote address: LID 0x13 QPN 0x051c PSN 0x9436f1 RKey 0x1fff00 VAddr 0x00155554d71000
+ remote address: LID 0x13 QPN 0x051d PSN 0x72c441 RKey 0x1fff00 VAddr 0x00155554d81000
+ remote address: LID 0x13 QPN 0x051e PSN 0xe2732f RKey 0x1fff00 VAddr 0x00155554d91000
+ remote address: LID 0x13 QPN 0x051f PSN 0x4c7aa7 RKey 0x1fff00 VAddr 0x00155554da1000
+ remote address: LID 0x13 QPN 0x0520 PSN 0xf103ae RKey 0x1fff00 VAddr 0x00155554db1000
+ remote address: LID 0x13 QPN 0x0521 PSN 0x5dd302 RKey 0x1fff00 VAddr 0x00155554dc1000
+ remote address: LID 0x13 QPN 0x0522 PSN 0xaa8d87 RKey 0x1fff00 VAddr 0x00155554dd1000
+ remote address: LID 0x13 QPN 0x0523 PSN 0xb91139 RKey 0x1fff00 VAddr 0x00155554de1000
+ remote address: LID 0x13 QPN 0x0524 PSN 0x1b5b09 RKey 0x1fff00 VAddr 0x00155554df1000
+---------------------------------------------------------------------------------------
+ #bytes     #iterations    BW peak[Gb/sec]    BW average[Gb/sec]   MsgRate[Mpps]
+ 65536      7526227          0.00               394.59               0.752624
+---------------------------------------------------------------------------------------
+root@dgx06:~#
+
