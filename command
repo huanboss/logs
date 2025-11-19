@@ -1,5 +1,5 @@
 pexec -c dgx-h100 -j "for i in 0 3 4 5 6 9 10 11; do ibstat -d mlx5_${i} \| grep -i \\"mlx5_\\|state\\|infiniband\"; done"
-
+pexec -c dgx-h100 -j "for i in dc 9a ce c0 4f 40 5e 18 ; do mst start; mlxconfig -d $i:00.0 q; done | grep -e \"SRIOV_EN\\|LINK_TYPE\\|NUM_OF_VFS\";"
 pexec -c dgx-h100 -j "lspci \| grep ConnectX"
 
 
