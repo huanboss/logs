@@ -55,4 +55,4 @@ export NCCL_MIN_NCHANNELS=8
 export NCCL_MAX_NCHANNELS=32
 export NCCL_IB_QPS_PER_CONNECTION=2
 
-
+srun --export="NCCL_DEBUG=INFO,NCCL_IB_DISABLE=0, LD_LIBRARY_PATH, NCCL_IB_SL=1" -w dgx04,dgx06 -N 2 --ntasks-per-node=8 --gpus-per-task=1 --mpi=pmix --container-image=/cm/shared/enrootdemo/nvidia+tensorrt+23.04-py3.sqsh all_reduce_perf_mpi -b 1M -e 4G -f 2 -g 1
