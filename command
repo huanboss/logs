@@ -3,6 +3,9 @@ pexec -c dgx-h100 -j "for i in dc 9a ce c0 4f 40 5e 18 ; do mst start; mlxconfig
 pexec -c dgx-h100 -j "for i in dc 9a ce c0 4f 40 5e 18 ; do mst start; mlxconfig -d $i:00.0 -y set SRIOV_EN=1 NUM_OF_VFS=8 LINK_TYPE_P1=1 ; done"
 pexec -c dgx-h100 -j "lspci \| grep ConnectX"
 
+root@DGX02:~# dmidecode -t system | grep Serial
+        Serial Number: 1662225610008
+
 
 pdsh -g category=k8s-control-plane service containerd restart
 pdsh -g category=k8s-control-plane service kubelet restart
