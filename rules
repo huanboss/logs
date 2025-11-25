@@ -1,0 +1,162 @@
+#
+# Shorewall version 4 - Rules File
+#
+# For information on the settings in this file, type "man shorewall-rules"
+#
+# The manpage is also online at
+# http://www.shorewall.net/manpages/shorewall-rules.html
+#
+######################################################################################################################################################################################################
+#ACTION   SOURCE    DEST    PROTO DEST  SOURCE    ORIGINAL  RATE    USER/ MARK  CONNLIMIT TIME    HEADERS   SWITCH    HELPER
+#             PORT(S) PORT(S)   DEST    LIMIT   GROUP
+# ?SECTION ALL
+# ?SECTION ESTABLISHED
+# ?SECTION RELATED
+# ?SECTION INVALID
+# ?SECTION UNTRACKED
+# ?SECTION NEW
+
+# -- Allow ping from network to master
+ACCEPT          net             fw              icmp    8
+
+###############################################################################
+# SSH (đổi port)
+###############################################################################
+# -- Allow SSH to master from outside
+ACCEPT:info     net             fw              tcp     60022     # CMSSH
+
+###############################################################################
+# CMDaemon / Cluster management
+###############################################################################
+# -- Allow cluster management traffic from outside
+ACCEPT          net             fw              tcp     8080      # CMDaemon HTTP
+ACCEPT          net             fw              tcp     8081      # CMDaemon HTTPS
+ACCEPT          net             fw              udp     8082      # cm-nfs-checker
+
+###############################################################################
+# Web GUI
+###############################################################################
+ACCEPT          net             fw              tcp     80
+ACCEPT          net             fw              tcp     443
+
+###############################################################################
+# Node Provisioning (PXE)
+###############################################################################
+ACCEPT          net             fw              udp     67:68
+ACCEPT          net             fw              udp     69
+ACCEPT          net             fw              tcp     873
+ACCEPT          net             fw              udp     873
+
+###############################################################################
+# Authentication / NTP
+###############################################################################
+ACCEPT          net             fw              tcp     389
+ACCEPT          net             fw              tcp     636
+ACCEPT          net             fw              udp     123
+
+###############################################################################
+# NFS Services (full)
+###############################################################################
+ACCEPT          net             fw              tcp     111     # portmapper
+ACCEPT          net             fw              udp     111
+ACCEPT          net             fw              tcp     2049    # nfsd
+ACCEPT          net             fw              udp     2049
+ACCEPT          net             fw              tcp     942
+ACCEPT          net             fw              udp     942
+ACCEPT          net             fw              tcp     4000    # statd
+ACCEPT          net             fw              udp     4000
+ACCEPT          net             fw              tcp     4001    # lockd
+ACCEPT          net             fw              udp     4001
+ACCEPT          net             fw              tcp     4002    # mountd
+ACCEPT          net             fw              udp     4002
+ACCEPT          net             fw              tcp     4003    # rquotad
+ACCEPT          net             fw              udp     4003
+ACCEPT          net             fw              udp     4005
+
+###############################################################################
+# Kubernetes Control Plane
+###############################################################################
+ACCEPT          net             fw              tcp     2379
+ACCEPT          net             fw              tcp     2380
+ACCEPT          net             fw              tcp     6443
+ACCEPT          net             fw              tcp     10443:10444
+ACCEPT          net             fw              tcp     10249:10259
+
+###############################################################################
+# Worker Node Ports
+###############################################################################
+ACCEPT          net             fw              tcp     30000:32767
+ACCEPT          net             fw              udp     30000:32767
+
+###############################################################################
+# Ingress
+###############################################################################
+#ACCEPT          net             fw              tcp     30080
+#ACCEPT          net             fw              tcp     30443
+
+###############################################################################
+# BCM Networking 6780–6784
+###############################################################################
+ACCEPT          net             fw              tcp     6780:6784
+ACCEPT          net             fw              udp     6780:6784
+
+###############################################################################
+# Workload Managers
+###############################################################################
+# Slurm
+ACCEPT          net             fw              tcp     6817
+ACCEPT          net             fw              tcp     6818
+ACCEPT          net             fw              tcp     6819
+
+# PBS Pro
+ACCEPT          net             fw              tcp     15001:15007
+ACCEPT          net             fw              udp     15001:15007
+
+# UGE
+ACCEPT          net             fw              tcp     6444
+ACCEPT          net             fw              tcp     6445
+
+# LSF
+ACCEPT          net             fw              tcp     7869
+ACCEPT          net             fw              udp     7869
+ACCEPT          net             fw              tcp     6878
+ACCEPT          net             fw              tcp     6881
+ACCEPT          net             fw              tcp     6882
+ACCEPT          net             fw              tcp     6891
+
+###############################################################################
+# NVIDIA / DGX
+###############################################################################
+ACCEPT          net             fw              tcp     5555
+ACCEPT          net             fw              tcp     9100
+
+###############################################################################
+# Additional Operational Ports
+###############################################################################
+ACCEPT          net             fw              tcp     53
+ACCEPT          net             fw              udp     53
+ACCEPT          net             fw              udp     514
+ACCEPT          net             fw              udp     161:162
+ACCEPT          net             fw              udp     8472
+ACCEPT          net             fw              tcp     9090
+ACCEPT          net             fw              tcp     9000
+ACCEPT          net             fw              udp     9000
+ACCEPT          net             fw              tcp     9099
+ACCEPT          net             fw              tcp     9400
+ACCEPT          net             fw              tcp     2381
+
+###############################################################################
+# BGP / VXLAN / WireGuard / Calico / Cilium
+###############################################################################
+ACCEPT          net             fw              tcp     179
+ACCEPT          net             fw              udp     4789
+ACCEPT          net             fw              tcp     5473
+ACCEPT          net             fw              udp     51820
+ACCEPT          net             fw              udp     51821
+
+# This section of this file was automatically generated by cmd. Do not edit manually!
+# BEGIN AUTOGENERATED SECTION -- DO NOT REMOVE
+# END AUTOGENERATED SECTION   -- DO NOT REMOVE
+
+#
+#LAST LINE -- ADD YOUR ENTRIES BEFORE THIS ONE -- DO NOT REMOVE
